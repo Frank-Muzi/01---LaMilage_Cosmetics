@@ -7,6 +7,7 @@ import CartDrawer from "../components/CartDrawer";
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const { user, logout } = useContext(UserContext);
   const { cart } = useContext(CartContext);
@@ -22,6 +23,10 @@ const Navbar = () => {
     navigate("/");
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenu(!mobileMenu);
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,43 +40,45 @@ const Navbar = () => {
 
   return (
     <>
-      <nav
-        style={{
-          backgroundColor: "#000",
-          color: "#ebdc04",
-          padding: "1rem 2rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 999,
-          boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h2>Welcome to Lamilage Cosmetics</h2>
+      <nav style={navStyle}>
+        <h2 style={logoStyle}>Lamilage</h2>
 
-        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-          <Link to="/" style={linkStyle}>
+        {/* Hamburger Menu */}
+        <div style={hamburger} onClick={toggleMobileMenu}>
+          ☰
+        </div>
+
+        <div
+          style={{
+            ...navLinks,
+            ...(mobileMenu ? mobileMenuOpen : {}),
+          }}
+        >
+          <Link to="/" style={linkStyle} onClick={() => setMobileMenu(false)}>
             Home
           </Link>
 
-          {/* CART BUTTON */}
+          {/* CART */}
           <div
-            onClick={() => setIsCartOpen(true)}
+            onClick={() => {
+              setIsCartOpen(true);
+              setMobileMenu(false);
+            }}
             style={{ ...linkStyle, position: "relative", cursor: "pointer" }}
           >
             Cart
             {cart.length > 0 && <span style={badgeStyle}>{cart.length}</span>}
           </div>
 
-          <Link to="/contact" style={linkStyle}>
+          <Link
+            to="/contact"
+            style={linkStyle}
+            onClick={() => setMobileMenu(false)}
+          >
             Contact
           </Link>
 
-          {/* USER DROPDOWN */}
+          {/* USER */}
           <div
             style={{ position: "relative", display: "flex", alignItems: "center" }}
             ref={dropdownRef}
@@ -80,9 +87,8 @@ const Navbar = () => {
               onClick={toggleDropdown}
               style={{
                 cursor: "pointer",
-                fontSize: "1rem",
+                fontSize: "1.2rem",
                 marginRight: "6px",
-                filter: "sepia(1) saturate(10) hue-rotate(45deg)", // bright yellow
               }}
             >
               👤
@@ -101,24 +107,12 @@ const Navbar = () => {
             )}
 
             {showDropdown && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "120%",
-                  right: 0,
-                  backgroundColor: "#090909",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-                  zIndex: 1000,
-                  minWidth: "140px",
-                }}
-              >
+              <div style={dropdownStyle}>
                 {user ? (
                   <>
                     <Link
                       to="/profile"
-                      style={{ ...linkStyle, display: "block", padding: "0.5rem 1rem" }}
+                      style={dropdownLink}
                       onClick={() => setShowDropdown(false)}
                     >
                       View Profile
@@ -127,7 +121,7 @@ const Navbar = () => {
                     <Link
                       to="/"
                       onClick={handleSignOut}
-                      style={{ ...linkStyle, display: "block", padding: "0.5rem 1rem" }}
+                      style={dropdownLink}
                     >
                       Sign Out
                     </Link>
@@ -136,7 +130,7 @@ const Navbar = () => {
                   <>
                     <Link
                       to="/login"
-                      style={{ ...linkStyle, display: "block", padding: "0.5rem 1rem" }}
+                      style={dropdownLink}
                       onClick={() => setShowDropdown(false)}
                     >
                       Login
@@ -144,7 +138,7 @@ const Navbar = () => {
 
                     <Link
                       to="/register"
-                      style={{ ...linkStyle, display: "block", padding: "0.5rem 1rem" }}
+                      style={dropdownLink}
                       onClick={() => setShowDropdown(false)}
                     >
                       Register
@@ -157,16 +151,72 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* CART DRAWER */}
       <CartDrawer isOpen={isCartOpen} closeCart={() => setIsCartOpen(false)} />
     </>
   );
+};
+
+const navStyle = {
+  backgroundColor: "#000",
+  color: "#ebdc04",
+  padding: "1rem 2rem",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: 999,
+};
+
+const logoStyle = {
+  fontSize: "1.2rem",
+};
+
+const navLinks = {
+  display: "flex",
+  gap: "20px",
+  alignItems: "center",
+};
+
+const mobileMenuOpen = {
+  position: "absolute",
+  top: "70px",
+  left: 0,
+  right: 0,
+  backgroundColor: "#000",
+  flexDirection: "column",
+  padding: "20px",
+};
+
+const hamburger = {
+  display: "none",
+  fontSize: "1.8rem",
+  cursor: "pointer",
 };
 
 const linkStyle = {
   color: "#e3dc03",
   textDecoration: "none",
   fontWeight: "500",
+};
+
+const dropdownStyle = {
+  position: "absolute",
+  top: "120%",
+  right: 0,
+  backgroundColor: "#090909",
+  border: "1px solid #ccc",
+  borderRadius: "4px",
+  minWidth: "140px",
+};
+
+const dropdownLink = {
+  display: "block",
+  padding: "10px",
+  color: "#e3dc03",
+  textDecoration: "none",
 };
 
 const badgeStyle = {
