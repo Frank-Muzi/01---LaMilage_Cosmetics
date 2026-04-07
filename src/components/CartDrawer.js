@@ -1,9 +1,20 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
 import { Link } from "react-router-dom";
 
 const CartDrawer = ({ isOpen, closeCart }) => {
   const { cart, removeFromCart, updateQuantity } = useContext(CartContext);
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
 
@@ -37,20 +48,29 @@ const CartDrawer = ({ isOpen, closeCart }) => {
           position: "fixed",
           top: 0,
           right: 0,
-          width: isOpen ? "30%" : "0",
+          width: isOpen ? (isMobile ? "100%" : "400px") : "0",
           height: "100%",
           background: "white",
           boxShadow: "-2px 0 10px rgba(0,0,0,0.2)",
-          overflowX: "hidden",
+          overflowY: "auto",
           transition: "0.3s",
           zIndex: 2000,
           padding: isOpen ? "20px" : "0px",
         }}
       >
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "20px",
+            alignItems: "center",
+          }}
+        >
           <h2>Your Cart</h2>
-          <button onClick={closeCart} style={{ fontSize: "20px", cursor: "pointer" }}>✕</button>
+          <button onClick={closeCart} style={closeButton}>
+            ✕
+          </button>
         </div>
 
         {/* Cart Items */}
@@ -68,49 +88,61 @@ const CartDrawer = ({ isOpen, closeCart }) => {
                 key={item.id}
                 style={{
                   display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
                   justifyContent: "space-between",
-                  alignItems: "center",
+                  gap: "10px",
                   padding: "0.75rem",
                   border: "1px solid #eee",
-                  borderRadius: "6px"
+                  borderRadius: "6px",
                 }}
               >
+                {/* Product info */}
                 <div>
                   <p style={{ margin: 0, fontWeight: "500" }}>{item.name}</p>
                   <p style={{ margin: 0 }}>R{item.price} each</p>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  {/* Quantity controls */}
-                  <button onClick={() => handleDecrease(item)} style={qtyButtonStyle}>-</button>
+                {/* Controls */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <button onClick={() => handleDecrease(item)} style={qtyButtonStyle}>
+                    -
+                  </button>
+
                   <span>{item.qty}</span>
-                  <button onClick={() => handleIncrease(item)} style={qtyButtonStyle}>+</button>
 
-                  <p style={{ margin: "0 10px" }}>R{item.price * item.qty}</p>
+                  <button onClick={() => handleIncrease(item)} style={qtyButtonStyle}>
+                    +
+                  </button>
 
-                  <button onClick={() => removeFromCart(item.id)} style={removeButtonStyle}>
+                  <p style={{ margin: "0 10px", fontWeight: "500" }}>
+                    R{item.price * item.qty}
+                  </p>
+
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    style={removeButtonStyle}
+                  >
                     Remove
                   </button>
                 </div>
               </div>
             ))}
 
-            {/* Total & Checkout */}
+            {/* Total */}
             <h2 style={{ marginTop: "1.5rem" }}>Total: R{total}</h2>
+
+            {/* Checkout */}
             <Link
               to="/checkout"
-              onClick={closeCart} // <-- close drawer on checkout
-              style={{
-                padding: "0.75rem 1.5rem",
-                backgroundColor: "#000",
-                color: "#ffd700",
-                fontWeight: 600,
-                textDecoration: "none",
-                borderRadius: "6px",
-                display: "inline-block",
-                marginTop: "1rem",
-                textAlign: "center"
-              }}
+              onClick={closeCart}
+              style={checkoutButton}
             >
               Proceed to Checkout
             </Link>
@@ -121,23 +153,42 @@ const CartDrawer = ({ isOpen, closeCart }) => {
   );
 };
 
+const closeButton = {
+  fontSize: "22px",
+  border: "none",
+  background: "transparent",
+  cursor: "pointer",
+};
+
 const qtyButtonStyle = {
-  padding: "0.25rem 0.6rem",
+  padding: "6px 10px",
   borderRadius: "4px",
   border: "1px solid #ccc",
   background: "#f5f5f5",
   cursor: "pointer",
-  fontWeight: "bold"
+  fontWeight: "bold",
 };
 
 const removeButtonStyle = {
-  padding: "0.3rem 0.6rem",
+  padding: "6px 10px",
   borderRadius: "4px",
   border: "none",
   background: "#ff4d4d",
   color: "#fff",
   cursor: "pointer",
-  fontWeight: "500"
+  fontWeight: "500",
+};
+
+const checkoutButton = {
+  padding: "12px",
+  backgroundColor: "#000",
+  color: "#ffd700",
+  fontWeight: 600,
+  textDecoration: "none",
+  borderRadius: "6px",
+  display: "block",
+  marginTop: "1rem",
+  textAlign: "center",
 };
 
 export default CartDrawer;
