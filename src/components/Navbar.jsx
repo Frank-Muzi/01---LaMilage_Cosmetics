@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { CartContext } from "../context/CartContext";
 import CartDrawer from "../components/CartDrawer";
-import "./Navbar.css"; // we'll create this CSS
+import "./Navbar.css";
 
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -38,10 +38,10 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar">
-        {/* Logo (hidden on mobile) */}
+        {/* Logo hidden on mobile */}
         <h2 className="navbar-logo">Lamilage</h2>
 
-        {/* Hamburger Menu (visible on mobile) */}
+        {/* Hamburger menu */}
         <div className="navbar-hamburger" onClick={toggleMobileMenu}>
           ☰
         </div>
@@ -63,11 +63,7 @@ const Navbar = () => {
             {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
           </div>
 
-          <Link
-            to="/contact"
-            className="nav-link"
-            onClick={() => setMobileMenu(false)}
-          >
+          <Link to="/contact" className="nav-link" onClick={() => setMobileMenu(false)}>
             Contact
           </Link>
 
