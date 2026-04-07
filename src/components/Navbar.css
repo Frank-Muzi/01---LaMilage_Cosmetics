@@ -33,6 +33,13 @@
   white-space: nowrap; /* prevent breaking words */
 }
 
+/* Cart link */
+.nav-link.cart-link {
+  position: relative; /* anchor cart-badge */
+  cursor: pointer;
+}
+
+/* Cart badge */
 .cart-badge {
   position: absolute;
   top: -8px;
