@@ -9,32 +9,31 @@ const Home = () => {
   const [addedIds, setAddedIds] = useState([]);
   const [navbarHeight, setNavbarHeight] = useState(0);
 
-  // Load featured products
   useEffect(() => {
     const loadProducts = async () => {
       const data = await fetchProducts();
-      if (data) setProducts(data.slice(0, 12));
+      if (data) setProducts(data.slice(0, 12)); // featured products
     };
     loadProducts();
-  }, []);
 
-  // Track navbar height for mobile gap
-  useEffect(() => {
-    const updateNavbarHeight = () => {
+    // Calculate navbar height dynamically
+    const calculateNavbarHeight = () => {
       const navbar = document.querySelector(".navbar");
-      setNavbarHeight(navbar ? navbar.offsetHeight : 0);
+      if (navbar) setNavbarHeight(navbar.offsetHeight);
     };
 
-    updateNavbarHeight();
-    window.addEventListener("resize", updateNavbarHeight);
-
-    return () => window.removeEventListener("resize", updateNavbarHeight);
+    calculateNavbarHeight();
+    window.addEventListener("resize", calculateNavbarHeight);
+    return () => window.removeEventListener("resize", calculateNavbarHeight);
   }, []);
 
   const handleAddToCart = (product) => {
     addToCart(product);
     setAddedIds((prev) => [...prev, product.id]);
-    setTimeout(() => setAddedIds((prev) => prev.filter((id) => id !== product.id)), 1000);
+    setTimeout(
+      () => setAddedIds((prev) => prev.filter((id) => id !== product.id)),
+      1000
+    );
   };
 
   return (
@@ -52,7 +51,7 @@ const Home = () => {
           textAlign: "center",
           padding: "2rem",
           boxSizing: "border-box",
-          paddingTop: `${navbarHeight}px`, // dynamic padding based on navbar
+          paddingTop: `${navbarHeight}px`, // dynamic padding to remove gap
           margin: 0,
         }}
       >
