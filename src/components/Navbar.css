@@ -1,4 +1,4 @@
-/* Desktop navbar */
+/* Desktop & Mobile navbar */
 .navbar {
   background-color: #000;
   color: #ebdc04;
@@ -17,18 +17,19 @@
   font-size: 1.5rem;
 }
 
+/* Nav links always visible */
 .nav-links {
   display: flex;
   gap: 20px;
   align-items: center;
-  flex-wrap: nowrap; /* prevent wrapping on desktop */
+  flex-wrap: wrap; /* allow wrapping on very small screens */
 }
 
 .nav-link {
   color: #e3dc03;
   text-decoration: none;
   font-weight: 500;
-  white-space: nowrap; /* keep links in one line */
+  white-space: nowrap; /* prevent breaking words */
 }
 
 .cart-badge {
@@ -78,43 +79,30 @@
   text-decoration: none;
 }
 
-/* Mobile adjustments */
+/* Remove hamburger completely */
 .navbar-hamburger {
   display: none;
-  font-size: 1.8rem;
-  cursor: pointer;
 }
 
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .navbar-logo {
     display: none; /* hide logo on mobile */
   }
 
-  .navbar-hamburger {
-    display: block;
-  }
-
+  /* Nav links always visible on mobile, wrap if needed */
   .nav-links {
-    flex-direction: row; /* keep all links in one row */
-    flex-wrap: wrap;     /* allow wrapping instead of horizontal scroll */
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-around;
-    position: absolute;
-    top: 70px;
-    left: 0;
-    right: 0;
-    background-color: #000;
-    padding: 10px 0;
-    display: none;
     gap: 10px;
-  }
-
-  .nav-links.open {
-    display: flex;
+    width: 100%;
+    padding: 0;
   }
 
   .nav-link {
-    font-size: 1rem; /* smaller font to fit mobile */
-    flex: 1 1 auto;  /* allow shrinking/growing to fit */
+    font-size: 1rem;
+    flex: 1 1 auto;  /* shrink/grow to fit screen */
     text-align: center;
   }
 
