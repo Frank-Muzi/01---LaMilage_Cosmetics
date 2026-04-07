@@ -9,22 +9,19 @@ const ProductPage = () => {
   const { addToCart } = useContext(CartContext);
 
   const [product, setProduct] = useState(location.state?.product || null);
-  const [products, setProducts] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      const data = await fetchProducts();
-      setProducts(data);
-
+    const loadProduct = async () => {
       if (!product) {
+        const data = await fetchProducts();
         const selected = data.find((p) => String(p.id) === String(id));
         setProduct(selected);
       }
     };
 
-    loadProducts();
+    loadProduct();
   }, [id, product]);
 
   const increaseQty = () => {
@@ -52,30 +49,46 @@ const ProductPage = () => {
     );
   }
 
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id)
-    .slice(0, 4);
-
   return (
     <div
       style={{
-        paddingTop: "120px",
         maxWidth: "1100px",
         margin: "auto",
         padding: "120px 1rem 2rem 1rem",
       }}
     >
+      {/* BACK TO SHOP */}
+      <Link
+        to="/shop"
+        style={{
+          display: "inline-block",
+          marginBottom: "2rem",
+          textDecoration: "none",
+          color: "#000",
+          fontWeight: "bold",
+          fontSize: "1rem",
+        }}
+      >
+        ← Back to Shop
+      </Link>
+
       {/* PRODUCT SECTION */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "2rem",
-          alignItems: "center",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "2.5rem",
+          alignItems: "flex-start",
         }}
       >
-        {/* IMAGE */}
-        <div style={{ textAlign: "center" }}>
+        {/* PRODUCT IMAGE */}
+        <div
+          style={{
+            overflow: "hidden",
+            borderRadius: "8px",
+            textAlign: "center",
+          }}
+        >
           <img
             src={product.image_url}
             alt={product.name}
@@ -83,11 +96,19 @@ const ProductPage = () => {
               width: "100%",
               maxWidth: "420px",
               objectFit: "contain",
+              transition: "transform 0.4s ease",
+              cursor: "zoom-in",
             }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.transform = "scale(1.3)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           />
         </div>
 
-        {/* INFO */}
+        {/* PRODUCT INFO */}
         <div>
           <h1 style={{ marginBottom: "1rem" }}>{product.name}</h1>
 
