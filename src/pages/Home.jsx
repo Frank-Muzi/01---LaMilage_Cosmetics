@@ -23,7 +23,8 @@ const Home = () => {
   };
 
   return (
-    <div style={{ background: "#fff", margin: 0, padding: 0 }}>
+    <div style={{ margin: 0, padding: 0, boxSizing: "border-box", background: "#fff" }}>
+      
       {/* Hero Section */}
       <section
         style={{
@@ -36,26 +37,15 @@ const Home = () => {
           alignItems: "center",
           textAlign: "center",
           padding: "2rem",
+          margin: 0,       // no gap under navbar
           boxSizing: "border-box",
-          marginTop: 0,          // remove gap under navbar
         }}
       >
         <div style={{ maxWidth: "600px" }}>
-          <h1
-            style={{
-              fontSize: "clamp(1.5rem, 6vw, 3rem)",
-              marginBottom: "1rem",
-              lineHeight: "1.2",
-            }}
-          >
+          <h1 style={{ fontSize: "clamp(1.5rem, 6vw, 3rem)", marginBottom: "1rem", lineHeight: 1.2 }}>
             LaMilage Cosmetics
           </h1>
-          <p
-            style={{
-              fontSize: "clamp(1rem, 4vw, 1.5rem)",
-              marginBottom: "1.5rem",
-            }}
-          >
+          <p style={{ fontSize: "clamp(1rem, 4vw, 1.5rem)", marginBottom: "1.5rem" }}>
             A Scent That Speaks Before You Do
           </p>
           <Link
@@ -77,14 +67,8 @@ const Home = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section style={{ padding: "2rem 1rem", marginTop: "0" }}>
-        <h2
-          style={{
-            textAlign: "center",
-            marginBottom: "25px",
-            fontSize: "clamp(1.2rem, 4vw, 2rem)",
-          }}
-        >
+      <section style={{ padding: "2rem 1rem", margin: 0 }}>
+        <h2 style={{ textAlign: "center", marginBottom: "25px", fontSize: "clamp(1.2rem, 4vw, 2rem)" }}>
           Featured Products
         </h2>
 
@@ -114,21 +98,10 @@ const Home = () => {
                 alt={product.name}
                 style={{ width: "100%", height: "180px", objectFit: "contain" }}
               />
-              <h4
-                style={{
-                  fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)",
-                  marginTop: "0.5rem",
-                }}
-              >
+              <h4 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)", marginTop: "0.5rem" }}>
                 {product.name}
               </h4>
-              <p
-                style={{
-                  color: "red",
-                  fontWeight: "bold",
-                  fontSize: "clamp(0.9rem, 2vw, 1rem)",
-                }}
-              >
+              <p style={{ color: "red", fontWeight: "bold", fontSize: "clamp(0.9rem, 2vw, 1rem)" }}>
                 R {product.price}
               </p>
 
