@@ -39,7 +39,7 @@ const Navbar = () => {
     <>
       <nav className="navbar">
         {/* Logo (always visible on desktop, hidden on mobile) */}
-        <h2 className="navbar-logo">Lamilage</h2>
+        <h2 className="navbar-logo">Welcome to Lamilage</h2>
 
         {/* Hamburger Menu (mobile only) */}
         <div className="navbar-hamburger" onClick={toggleMobileMenu}>

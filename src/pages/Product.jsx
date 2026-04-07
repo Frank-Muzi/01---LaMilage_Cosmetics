@@ -1,126 +1,169 @@
 import React, { useEffect, useState, useContext } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { fetchProducts } from "../supabaseClient";
 import { CartContext } from "../context/CartContext";
-import { Link } from "react-router-dom";
 
-const Home = () => {
-  const [products, setProducts] = useState([]);
+const ProductPage = () => {
+  const { id } = useParams();
+  const location = useLocation();
   const { addToCart } = useContext(CartContext);
-  const [addedIds, setAddedIds] = useState([]);
+
+  const [product, setProduct] = useState(location.state?.product || null);
+  const [products, setProducts] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     const loadProducts = async () => {
       const data = await fetchProducts();
-      if (data) setProducts(data.slice(0, 12));
-    };
-    loadProducts();
-  }, []);
+      setProducts(data);
 
-  const handleAddToCart = (product) => {
-    addToCart(product);
-    setAddedIds((prev) => [...prev, product.id]);
-    setTimeout(() => setAddedIds((prev) => prev.filter((id) => id !== product.id)), 1000);
+      if (!product) {
+        const selected = data.find((p) => String(p.id) === String(id));
+        setProduct(selected);
+      }
+    };
+
+    loadProducts();
+  }, [id, product]);
+
+  const increaseQty = () => {
+    setQuantity((prev) => prev + 1);
   };
 
+  const decreaseQty = () => {
+    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  };
+
+  const handleAddToCart = () => {
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1000);
+  };
+
+  if (!product) {
+    return (
+      <div style={{ paddingTop: "120px", textAlign: "center" }}>
+        Loading product...
+      </div>
+    );
+  }
+
+  const relatedProducts = products
+    .filter((p) => p.id !== product.id)
+    .slice(0, 4);
+
   return (
-    <div style={{ background: "#fff", padding: "0 1rem" }}>
-      {/* Hero Section */}
-      <section
+    <div
+      style={{
+        paddingTop: "120px",
+        maxWidth: "1100px",
+        margin: "auto",
+        padding: "120px 1rem 2rem 1rem",
+      }}
+    >
+      {/* PRODUCT SECTION */}
+      <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "2rem",
           alignItems: "center",
-          background: "#444343",
-          color: "#d4af37",
-          textAlign: "center",
-          padding: "3rem 1rem",
-          borderRadius: "8px",
-          marginBottom: "2rem",
         }}
       >
-        <Link
-          to="/shop"
-          style={{
-            padding: "0.75rem 1.5rem",
-            background: "#f7be03",
-            color: "#000",
-            textDecoration: "none",
-            fontWeight: "bold",
-            borderRadius: "6px",
-            fontSize: "1.2rem",
-          }}
-        >
-          Shop Now
-        </Link>
-      </section>
+        {/* IMAGE */}
+        <div style={{ textAlign: "center" }}>
+          <img
+            src={product.image_url}
+            alt={product.name}
+            style={{
+              width: "100%",
+              maxWidth: "420px",
+              objectFit: "contain",
+            }}
+          />
+        </div>
 
-      {/* Featured Products */}
-      <section>
-        <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Featured Products</h2>
+        {/* INFO */}
+        <div>
+          <h1 style={{ marginBottom: "1rem" }}>{product.name}</h1>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-            gap: "1rem",
-            justifyItems: "center",
-          }}
-        >
-          {products.map((product) => (
-            <div
-              key={product.id}
+          <p
+            style={{
+              color: "red",
+              fontSize: "1.6rem",
+              fontWeight: "bold",
+              marginBottom: "1rem",
+            }}
+          >
+            R {product.price}
+          </p>
+
+          <p style={{ marginBottom: "2rem", lineHeight: "1.6" }}>
+            {product.description ||
+              "Premium LaMilage fragrance crafted to leave a lasting impression."}
+          </p>
+
+          {/* QUANTITY CONTROLS */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <button
+              onClick={decreaseQty}
               style={{
-                textAlign: "center",
-                border: "1px solid #eee",
-                padding: "1rem",
-                borderRadius: "8px",
-                width: "100%",
-                maxWidth: "200px",
+                width: "35px",
+                height: "35px",
+                fontSize: "18px",
+                cursor: "pointer",
               }}
             >
-              <img
-                src={product.image_url}
-                alt={product.name}
-                style={{ width: "100%", height: "150px", objectFit: "contain" }}
-              />
-              <h4 style={{ fontSize: "1rem", marginTop: "0.5rem" }}>{product.name}</h4>
-              <p style={{ color: "red", fontWeight: "bold" }}>R {product.price}</p>
+              −
+            </button>
 
-              <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
-                <Link
-                  to={`/product/${product.id}`}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    background: "#000",
-                    color: "#fff",
-                    textDecoration: "none",
-                    fontSize: "0.9rem",
-                    borderRadius: "4px",
-                  }}
-                >
-                  View
-                </Link>
-                <button
-                  onClick={() => handleAddToCart(product)}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    background: "#d4af37",
-                    border: "none",
-                    fontSize: "0.9rem",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {addedIds.includes(product.id) ? "Added!" : "Add to Cart"}
-                </button>
-              </div>
-            </div>
-          ))}
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>
+              {quantity}
+            </span>
+
+            <button
+              onClick={increaseQty}
+              style={{
+                width: "35px",
+                height: "35px",
+                fontSize: "18px",
+                cursor: "pointer",
+              }}
+            >
+              +
+            </button>
+          </div>
+
+          {/* ADD TO CART */}
+          <button
+            onClick={handleAddToCart}
+            style={{
+              padding: "0.8rem 1.6rem",
+              background: "#d4af37",
+              border: "none",
+              fontSize: "1rem",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+          >
+            {added ? "Added!" : "Add to Cart"}
+          </button>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
-export default Home;
+export default ProductPage;

@@ -12,11 +12,11 @@ const Home = () => {
   useEffect(() => {
     const loadProducts = async () => {
       const data = await fetchProducts();
-      if (data) setProducts(data.slice(0, 12)); // featured products
+      if (data) setProducts(data.slice(0, 12)); // Featured products
     };
+
     loadProducts();
 
-    // Calculate navbar height dynamically
     const calculateNavbarHeight = () => {
       const navbar = document.querySelector(".navbar");
       if (navbar) setNavbarHeight(navbar.offsetHeight);
@@ -24,21 +24,26 @@ const Home = () => {
 
     calculateNavbarHeight();
     window.addEventListener("resize", calculateNavbarHeight);
+
     return () => window.removeEventListener("resize", calculateNavbarHeight);
   }, []);
 
   const handleAddToCart = (product) => {
     addToCart(product);
-    setAddedIds((prev) => [...prev, product.id]);
-    setTimeout(
-      () => setAddedIds((prev) => prev.filter((id) => id !== product.id)),
-      1000
-    );
+
+    if (!addedIds.includes(product.id)) {
+      setAddedIds((prev) => [...prev, product.id]);
+    }
+
+    setTimeout(() => {
+      setAddedIds((prev) => prev.filter((id) => id !== product.id));
+    }, 1000);
   };
 
   return (
     <div style={{ background: "#fff", margin: 0, padding: 0 }}>
-      {/* Hero Section */}
+      
+      {/* HERO SECTION */}
       <section
         style={{
           display: "flex",
@@ -51,7 +56,7 @@ const Home = () => {
           textAlign: "center",
           padding: "2rem",
           boxSizing: "border-box",
-          paddingTop: `${navbarHeight}px`, // dynamic padding to remove gap
+          paddingTop: `${navbarHeight}px`,
           margin: 0,
         }}
       >
@@ -65,6 +70,7 @@ const Home = () => {
           >
             LaMilage Cosmetics
           </h1>
+
           <p
             style={{
               fontSize: "clamp(1rem, 4vw, 1.5rem)",
@@ -73,6 +79,7 @@ const Home = () => {
           >
             A Scent That Speaks Before You Do
           </p>
+
           <Link
             to="/shop"
             style={{
@@ -91,7 +98,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* FEATURED PRODUCTS */}
       <section style={{ padding: "2rem 1rem", marginTop: "0" }}>
         <h2
           style={{
@@ -127,8 +134,13 @@ const Home = () => {
               <img
                 src={product.image_url}
                 alt={product.name}
-                style={{ width: "100%", height: "180px", objectFit: "contain" }}
+                style={{
+                  width: "100%",
+                  height: "180px",
+                  objectFit: "contain",
+                }}
               />
+
               <h4
                 style={{
                   fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)",
@@ -137,6 +149,7 @@ const Home = () => {
               >
                 {product.name}
               </h4>
+
               <p
                 style={{
                   color: "red",
@@ -156,8 +169,10 @@ const Home = () => {
                   flexWrap: "wrap",
                 }}
               >
+                {/* VIEW BUTTON */}
                 <Link
                   to={`/product/${product.id}`}
+                  state={{ product }}
                   style={{
                     padding: "0.5rem 0.75rem",
                     background: "#000",
@@ -170,6 +185,7 @@ const Home = () => {
                   View
                 </Link>
 
+                {/* ADD TO CART */}
                 <button
                   onClick={() => handleAddToCart(product)}
                   style={{
@@ -181,7 +197,9 @@ const Home = () => {
                     cursor: "pointer",
                   }}
                 >
-                  {addedIds.includes(product.id) ? "Added!" : "Add to Cart"}
+                  {addedIds.includes(product.id)
+                    ? "Added!"
+                    : "Add to Cart"}
                 </button>
               </div>
             </div>
