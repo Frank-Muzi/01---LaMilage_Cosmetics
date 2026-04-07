@@ -11,6 +11,7 @@
   left: 0;
   right: 0;
   z-index: 999;
+  height: 70px; /* fixed height for consistency */
 }
 
 .navbar-logo {
@@ -90,6 +91,12 @@
 @media (max-width: 768px) {
   .navbar-logo {
     display: none; /* hide logo on mobile */
+  }
+
+  /* Force same navbar height on mobile */
+  .navbar {
+    height: 70px; /* same as desktop */
+    padding: 1rem 1.5rem; /* optional: reduce horizontal padding */
   }
 
   /* Nav links always visible on mobile, wrap if needed */
