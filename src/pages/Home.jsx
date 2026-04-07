@@ -23,7 +23,7 @@ const Home = () => {
   };
 
   return (
-    <div style={{ background: "#fff", paddingTop: "80px" /* space for fixed navbar */ }}>
+    <div style={{ background: "#fff", margin: 0, padding: 0 }}>
       {/* Hero Section */}
       <section
         style={{
@@ -37,6 +37,7 @@ const Home = () => {
           textAlign: "center",
           padding: "2rem",
           boxSizing: "border-box",
+          marginTop: 0,          // remove gap under navbar
         }}
       >
         <div style={{ maxWidth: "600px" }}>
@@ -76,7 +77,7 @@ const Home = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section style={{ padding: "2rem 1rem" }}>
+      <section style={{ padding: "2rem 1rem", marginTop: "0" }}>
         <h2
           style={{
             textAlign: "center",
