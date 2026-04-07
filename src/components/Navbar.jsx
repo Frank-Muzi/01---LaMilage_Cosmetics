@@ -38,10 +38,10 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar">
-        {/* Logo hidden on mobile */}
+        {/* Logo (always visible on desktop, hidden on mobile) */}
         <h2 className="navbar-logo">Lamilage</h2>
 
-        {/* Hamburger menu */}
+        {/* Hamburger Menu (mobile only) */}
         <div className="navbar-hamburger" onClick={toggleMobileMenu}>
           ☰
         </div>
@@ -69,14 +69,24 @@ const Navbar = () => {
 
           {/* User Dropdown */}
           <div className="user-dropdown" ref={dropdownRef}>
-            <span className="user-icon" onClick={toggleDropdown}>👤</span>
-            {user && <span className="user-name">{user.user_metadata?.first_name || user.email}</span>}
+            <span className="user-icon" onClick={toggleDropdown}>
+              👤
+            </span>
+            {user && (
+              <span className="user-name">
+                {user.user_metadata?.first_name || user.email}
+              </span>
+            )}
 
             {showDropdown && (
               <div className="dropdown-menu">
                 {user ? (
                   <>
-                    <Link to="/profile" className="dropdown-link" onClick={() => setShowDropdown(false)}>
+                    <Link
+                      to="/profile"
+                      className="dropdown-link"
+                      onClick={() => setShowDropdown(false)}
+                    >
                       View Profile
                     </Link>
                     <Link to="/" className="dropdown-link" onClick={handleSignOut}>
@@ -85,10 +95,18 @@ const Navbar = () => {
                   </>
                 ) : (
                   <>
-                    <Link to="/login" className="dropdown-link" onClick={() => setShowDropdown(false)}>
+                    <Link
+                      to="/login"
+                      className="dropdown-link"
+                      onClick={() => setShowDropdown(false)}
+                    >
                       Login
                     </Link>
-                    <Link to="/register" className="dropdown-link" onClick={() => setShowDropdown(false)}>
+                    <Link
+                      to="/register"
+                      className="dropdown-link"
+                      onClick={() => setShowDropdown(false)}
+                    >
                       Register
                     </Link>
                   </>

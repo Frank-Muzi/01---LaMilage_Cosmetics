@@ -11,7 +11,7 @@ const Home = () => {
   useEffect(() => {
     const loadProducts = async () => {
       const data = await fetchProducts();
-      if (data) setProducts(data.slice(0, 12));
+      if (data) setProducts(data.slice(0, 12)); // featured products
     };
     loadProducts();
   }, []);
@@ -23,20 +23,20 @@ const Home = () => {
   };
 
   return (
-    <div style={{ background: "#fff" }}>
+    <div style={{ background: "#fff", paddingTop: "80px" /* space for fixed navbar */ }}>
       {/* Hero Section */}
       <section
         style={{
           display: "flex",
           width: "100%",
           minHeight: "40vh",
-          marginBottom: "60px",
           background: "#444343",
           color: "#d4af37",
           justifyContent: "center",
           alignItems: "center",
           textAlign: "center",
           padding: "2rem",
+          boxSizing: "border-box",
         }}
       >
         <div style={{ maxWidth: "600px" }}>
@@ -75,9 +75,15 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section style={{ padding: "0 1rem 2rem" }}>
-        <h2 style={{ marginBottom: "25px", textAlign: "center", fontSize: "clamp(1.2rem, 4vw, 2rem)" }}>
+      {/* Featured Products Section */}
+      <section style={{ padding: "2rem 1rem" }}>
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "25px",
+            fontSize: "clamp(1.2rem, 4vw, 2rem)",
+          }}
+        >
           Featured Products
         </h2>
 
@@ -107,12 +113,33 @@ const Home = () => {
                 alt={product.name}
                 style={{ width: "100%", height: "180px", objectFit: "contain" }}
               />
-              <h4 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)", marginTop: "0.5rem" }}>{product.name}</h4>
-              <p style={{ color: "red", fontWeight: "bold", fontSize: "clamp(0.9rem, 2vw, 1rem)" }}>
+              <h4
+                style={{
+                  fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)",
+                  marginTop: "0.5rem",
+                }}
+              >
+                {product.name}
+              </h4>
+              <p
+                style={{
+                  color: "red",
+                  fontWeight: "bold",
+                  fontSize: "clamp(0.9rem, 2vw, 1rem)",
+                }}
+              >
                 R {product.price}
               </p>
 
-              <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  marginTop: "0.5rem",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Link
                   to={`/product/${product.id}`}
                   style={{
