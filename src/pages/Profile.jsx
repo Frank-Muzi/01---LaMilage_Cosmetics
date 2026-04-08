@@ -11,21 +11,21 @@ const Profile = () => {
   const [phone, setPhone] = useState("");
 
   const [orders, setOrders] = useState([]);
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  // Track which orders are open
+  const [openOrders, setOpenOrders] = useState({});
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Fetch orders function
   const fetchOrders = useCallback(async () => {
     if (!user) return;
 
@@ -38,17 +38,49 @@ const Profile = () => {
     if (!error) setOrders(data);
   }, [user]);
 
+  // Load user info & orders
   useEffect(() => {
     if (user) {
       setEmail(user.email);
       setFirstName(user.user_metadata?.first_name || "");
       setSurname(user.user_metadata?.surname || "");
       setPhone(user.user_metadata?.phone || "");
-
       fetchOrders();
     }
   }, [user, fetchOrders]);
 
+  // Real-time subscription for new orders
+  useEffect(() => {
+    if (!user) return;
+
+    const subscription = supabase
+      .channel("orders_channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "orders",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          setOrders((prev) => [payload.new, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(subscription);
+  }, [user]);
+
+  // Toggle open/close for order items
+  const toggleOrder = (orderId) => {
+    setOpenOrders((prev) => ({
+      ...prev,
+      [orderId]: !prev[orderId],
+    }));
+  };
+
+  // Update profile
   const handleUpdate = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -58,7 +90,6 @@ const Profile = () => {
       const { error } = await supabase.auth.updateUser({
         data: { first_name: firstName, surname, phone },
       });
-
       if (error) throw error;
 
       setMessage("Profile updated successfully!");
@@ -96,10 +127,9 @@ const Profile = () => {
           gap: "30px",
         }}
       >
-        {/* PERSONAL DETAILS */}
+        {/* Personal Details */}
         <div style={cardStyle}>
           <h2 style={titleStyle}>Personal Details</h2>
-
           <form
             onSubmit={handleUpdate}
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
@@ -111,7 +141,6 @@ const Profile = () => {
               onChange={(e) => setFirstName(e.target.value)}
               style={inputStyle}
             />
-
             <input
               type="text"
               placeholder="Surname"
@@ -119,14 +148,12 @@ const Profile = () => {
               onChange={(e) => setSurname(e.target.value)}
               style={inputStyle}
             />
-
             <input
               type="email"
               value={email}
               disabled
               style={{ ...inputStyle, backgroundColor: "#eee" }}
             />
-
             <input
               type="text"
               placeholder="Phone Number"
@@ -134,19 +161,16 @@ const Profile = () => {
               onChange={(e) => setPhone(e.target.value)}
               style={inputStyle}
             />
-
             <button type="submit" disabled={loading} style={buttonStyle}>
               {loading ? "Updating..." : "Update Profile"}
             </button>
-
             {message && <p style={{ color: "green" }}>{message}</p>}
           </form>
         </div>
 
-        {/* ORDER HISTORY */}
+        {/* Order History */}
         <div style={cardStyle}>
           <h2 style={titleStyle}>Order History</h2>
-
           {orders.length === 0 ? (
             <p style={{ textAlign: "center", color: "#777" }}>No orders yet</p>
           ) : (
@@ -162,6 +186,23 @@ const Profile = () => {
                   <strong>Date:</strong>{" "}
                   {new Date(order.created_at).toLocaleDateString()}
                 </p>
+
+                <button
+                  onClick={() => toggleOrder(order.id)}
+                  style={toggleButtonStyle}
+                >
+                  {openOrders[order.id] ? "Hide Items" : "Show Items"}
+                </button>
+
+                {openOrders[order.id] && order.items && order.items.length > 0 && (
+                  <ul style={{ marginTop: "10px" }}>
+                    {order.items.map((item, idx) => (
+                      <li key={idx}>
+                        {item.name} x {item.qty} - R{item.price * item.qty}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))
           )}
@@ -171,7 +212,7 @@ const Profile = () => {
   );
 };
 
-// STYLES
+/* --- STYLES --- */
 const cardStyle = {
   background: "#fff",
   padding: "30px",
@@ -210,6 +251,17 @@ const buttonStyle = {
   fontWeight: 700,
   fontSize: "1rem",
   cursor: "pointer",
+};
+
+const toggleButtonStyle = {
+  marginTop: "10px",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  border: "none",
+  backgroundColor: "#d4af37",
+  color: "#000",
+  cursor: "pointer",
+  fontWeight: "bold",
 };
 
 export default Profile;
