@@ -3,7 +3,7 @@ import { UserContext } from "../context/UserContext";
 import { supabase } from "../supabaseClient";
 
 const Profile = () => {
-  const { user } = useContext(UserContext); // removed logout as unused
+  const { user } = useContext(UserContext);
 
   const [firstName, setFirstName] = useState("");
   const [surname, setSurname] = useState("");
@@ -15,7 +15,17 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // fetchOrders wrapped in useCallback to satisfy useEffect dependency
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const fetchOrders = useCallback(async () => {
     if (!user) return;
 
@@ -37,7 +47,7 @@ const Profile = () => {
 
       fetchOrders();
     }
-  }, [user, fetchOrders]); // now safe, no ESLint warning
+  }, [user, fetchOrders]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -72,7 +82,7 @@ const Profile = () => {
       style={{
         minHeight: "100vh",
         backgroundColor: "#f8f8f8",
-        padding: "40px",
+        padding: isMobile ? "20px" : "40px",
         display: "flex",
         justifyContent: "center",
       }}
@@ -82,11 +92,11 @@ const Profile = () => {
           width: "100%",
           maxWidth: "1000px",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
           gap: "30px",
         }}
       >
-        {/* LEFT COLUMN */}
+        {/* PERSONAL DETAILS */}
         <div style={cardStyle}>
           <h2 style={titleStyle}>Personal Details</h2>
 
@@ -133,7 +143,7 @@ const Profile = () => {
           </form>
         </div>
 
-        {/* RIGHT COLUMN */}
+        {/* ORDER HISTORY */}
         <div style={cardStyle}>
           <h2 style={titleStyle}>Order History</h2>
 
