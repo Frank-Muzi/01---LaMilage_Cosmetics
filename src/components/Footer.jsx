@@ -40,7 +40,7 @@ const Footer = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             
             <a
-              href="https://facebook.com"
+              href="https://www.facebook.com/profile.php?id=100063801109490"
               target="_blank"
               rel="noopener noreferrer"
               style={{
