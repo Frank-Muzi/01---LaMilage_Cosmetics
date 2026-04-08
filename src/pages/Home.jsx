@@ -77,7 +77,7 @@ const Home = () => {
               marginBottom: "1.5rem",
             }}
           >
-            A Scent That Speaks Before You Do
+            The scent that matches your <span style={{color:"#ffd000"}}>Glow</span> 🌟
           </p>
 
           <Link
