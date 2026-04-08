@@ -45,7 +45,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               style={{
                 color: "#ffd000",
-                textDecoration: "none",
+                textDecoration: "underline",
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
@@ -62,7 +62,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               style={{
                 color: "#ffd000",
-                textDecoration: "none",
+                textDecoration: "underline",
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
