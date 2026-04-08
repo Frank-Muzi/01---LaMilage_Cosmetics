@@ -1,11 +1,9 @@
 import React, { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { supabase } from "../supabaseClient";
-import { UserContext } from "../context/UserContext";
 
 const Checkout = () => {
   const { cart, clearCart } = useContext(CartContext);
-  const { user } = useContext(UserContext); // get current user
 
   const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
 
@@ -19,7 +17,7 @@ const Checkout = () => {
 
   const [payment, setPayment] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleDeliveryChange = (e) => {
     setDelivery({ ...delivery, [e.target.name]: e.target.value });
@@ -35,42 +33,25 @@ const Checkout = () => {
       return;
     }
 
-    if (!user) {
-      alert("Please login first!");
-      return;
-    }
-
-    setLoading(true);
-
-    // Prepare order data
-    const orderData = {
-      user_id: user.id,
-      first_name: delivery.firstName,
-      last_name: delivery.lastName,
-      address: delivery.address,
-      apartment: delivery.apartment,
-      phone: delivery.phone,
-      payment_method: payment,
-      total,
-      items: cart.map((item) => ({
-        product_id: item._id,
-        name: item.name,
-        qty: item.qty,
-        price: item.price,
-      })), // storing cart items as JSON
-    };
-
     try {
-      const { data, error } = await supabase.from("orders").insert([orderData]);
+      // Insert order into Supabase
+      const { error } = await supabase.from("orders").insert([
+        {
+          user_id: supabase.auth.getUser().data.user?.id || null,
+          items: cart, // saved as 'items' column
+          total,
+          delivery_details: delivery,
+          payment_method: payment,
+        },
+      ]);
 
       if (error) throw error;
 
-      setShowSuccess(true); // show popup
-      clearCart(); // empty cart after order
+      setShowSuccess(true);
+      clearCart();
     } catch (err) {
-      alert("Failed to place order: " + err.message);
-    } finally {
-      setLoading(false);
+      console.error("Failed to place order:", err.message);
+      setErrorMsg("Failed to place order. Please try again.");
     }
   };
 
@@ -95,54 +76,30 @@ const Checkout = () => {
             gap: "30px",
           }}
         >
+          {/* DELIVERY DETAILS */}
           <div style={cardStyle}>
             <h3>Delivery Details</h3>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={delivery.firstName}
-              onChange={handleDeliveryChange}
-              required
-              style={inputStyle}
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Surname"
-              value={delivery.lastName}
-              onChange={handleDeliveryChange}
-              required
-              style={inputStyle}
-            />
-            <input
-              type="text"
-              name="address"
-              placeholder="Address"
-              value={delivery.address}
-              onChange={handleDeliveryChange}
-              required
-              style={inputStyle}
-            />
-            <input
-              type="text"
-              name="apartment"
-              placeholder="Apartment, Suite, or Unit"
-              value={delivery.apartment}
-              onChange={handleDeliveryChange}
-              style={inputStyle}
-            />
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              value={delivery.phone}
-              onChange={handleDeliveryChange}
-              required
-              style={inputStyle}
-            />
+            {["firstName", "lastName", "address", "apartment", "phone"].map(
+              (field) => (
+                <input
+                  key={field}
+                  type="text"
+                  name={field}
+                  placeholder={
+                    field === "apartment"
+                      ? "Apartment, Suite, or Unit"
+                      : field.charAt(0).toUpperCase() + field.slice(1)
+                  }
+                  value={delivery[field]}
+                  onChange={handleDeliveryChange}
+                  required={field !== "apartment"}
+                  style={inputStyle}
+                />
+              )
+            )}
           </div>
 
+          {/* PAYMENT */}
           <div style={cardStyle}>
             <h3>Payment</h3>
             <label style={radioLabel}>
@@ -155,7 +112,6 @@ const Checkout = () => {
               />
               Bank Deposit / Transfer
             </label>
-
             {payment === "bank" && (
               <div style={bankBox}>
                 <p>
@@ -168,7 +124,10 @@ const Checkout = () => {
                 <p>
                   <em>
                     Please email proof of payment to{" "}
-                    <a href="mailto:frankmuzim@gmail.com" style={{ color: "#d4af37" }}>
+                    <a
+                      href="mailto:frankmuzim@gmail.com"
+                      style={{ color: "#d4af37" }}
+                    >
                       frankmuzim@gmail.com
                     </a>
                   </em>
@@ -177,12 +136,14 @@ const Checkout = () => {
             )}
           </div>
 
-          <button type="submit" style={submitButtonStyle} disabled={loading}>
-            {loading ? "Placing Order..." : "Place Order"}
+          {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
+
+          <button type="submit" style={submitButtonStyle}>
+            Place Order
           </button>
         </form>
 
-        {/* RIGHT COLUMN: Cart Summary */}
+        {/* RIGHT COLUMN */}
         <div style={summaryBox}>
           <h3>Cart Summary</h3>
           {cart.length === 0 ? (
@@ -190,15 +151,26 @@ const Checkout = () => {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
               {cart.map((item) => (
-                <div key={item._id} style={{ display: "flex", justifyContent: "space-between" }}>
+                <div
+                  key={item._id}
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <span>
                     {item.name} x {item.qty}
                   </span>
                   <span>R{item.price * item.qty}</span>
                 </div>
               ))}
+
               <hr />
-              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold" }}>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontWeight: "bold",
+                }}
+              >
                 <span>Total:</span>
                 <span>R{total}</span>
               </div>
@@ -224,15 +196,95 @@ const Checkout = () => {
 };
 
 /* STYLES */
-const cardStyle = { border: "1px solid #eee", padding: "20px", borderRadius: "8px" };
-const summaryBox = { flex: "1 1 300px", border: "1px solid #eee", padding: "20px", borderRadius: "8px", minWidth: "300px", height: "fit-content" };
-const bankBox = { marginTop: "10px", padding: "10px", backgroundColor: "#f5f5f5", borderRadius: "6px", fontSize: "14px", lineHeight: "1.5" };
-const inputStyle = { width: "100%", padding: "10px", marginTop: "10px", borderRadius: "6px", border: "1px solid #ccc", fontSize: "14px", outline: "none" };
-const radioLabel = { display: "block", marginTop: "10px", fontSize: "14px", cursor: "pointer" };
-const submitButtonStyle = { padding: "12px 20px", backgroundColor: "#d4af37", border: "none", color: "#000", fontWeight: "bold", borderRadius: "6px", cursor: "pointer" };
-const popupOverlay = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 };
-const popupBox = { background: "#fff", padding: "40px", borderRadius: "12px", textAlign: "center", width: "90%", maxWidth: "400px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" };
-const tick = { fontSize: "60px", color: "green", marginBottom: "15px" };
-const closeButton = { marginTop: "20px", padding: "10px 20px", border: "none", borderRadius: "6px", backgroundColor: "#000", color: "#fff", cursor: "pointer" };
+
+const cardStyle = {
+  border: "1px solid #eee",
+  padding: "20px",
+  borderRadius: "8px",
+};
+
+const summaryBox = {
+  flex: "1 1 300px",
+  border: "1px solid #eee",
+  padding: "20px",
+  borderRadius: "8px",
+  minWidth: "300px",
+  height: "fit-content",
+};
+
+const bankBox = {
+  marginTop: "10px",
+  padding: "10px",
+  backgroundColor: "#f5f5f5",
+  borderRadius: "6px",
+  fontSize: "14px",
+  lineHeight: "1.5",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "10px",
+  marginTop: "10px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  fontSize: "14px",
+  outline: "none",
+};
+
+const radioLabel = {
+  display: "block",
+  marginTop: "10px",
+  fontSize: "14px",
+  cursor: "pointer",
+};
+
+const submitButtonStyle = {
+  padding: "12px 20px",
+  backgroundColor: "#d4af37",
+  border: "none",
+  color: "#000",
+  fontWeight: "bold",
+  borderRadius: "6px",
+  cursor: "pointer",
+};
+
+const popupOverlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: "rgba(0,0,0,0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+
+const popupBox = {
+  background: "#fff",
+  padding: "40px",
+  borderRadius: "12px",
+  textAlign: "center",
+  width: "90%",
+  maxWidth: "400px",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+};
+
+const tick = {
+  fontSize: "60px",
+  color: "green",
+  marginBottom: "15px",
+};
+
+const closeButton = {
+  marginTop: "20px",
+  padding: "10px 20px",
+  border: "none",
+  borderRadius: "6px",
+  backgroundColor: "#000",
+  color: "#fff",
+  cursor: "pointer",
+};
 
 export default Checkout;
