@@ -26,13 +26,10 @@ const Footer = () => {
           <h3 style={{ marginBottom: "15px" }}>LaMilage Cosmetics</h3>
 
           <p style={{ lineHeight: "1.7", fontSize: "14px", color: "#e6c200" }}>
-            Established in 2019, Lamilage Cosmetics is a beauty and fragrance brand dedicated to enhancing both your scent and your glow.
-            Guided by our belief that beauty is deeply personal, we create luxurious perfumes and targeted skincare products designed to complement your individuality.
-            Our fragrances are crafted to leave a lasting impression, while our skincare range focuses on addressing minor skin concerns — helping you feel confident, radiant, and refined.
+            Founded in 2019, Lamilage Cosmetics is a beauty brand offering elegant perfumes and targeted skincare designed to enhance confidence and natural glow.
+            We create luxurious, thoughtfully crafted products that help you look good, feel good, and show up with confidence.
             <br /><br />
-            At Lamilage Cosmetics, we do more than create products — we create experiences. From our signature black and gold aesthetic to the carefully selected ingredients and scents, every detail is designed to reflect elegance, quality, and intention.
-            <br /><br />
-            We understand that how you smell and how your skin feels both play a powerful role in how you show up in the world. That is why our mission is simple: to help you align your outer beauty with your inner glow.
+            Lamilage Cosmetics — the scent that matches your glow.
           </p>
         </div>
 
