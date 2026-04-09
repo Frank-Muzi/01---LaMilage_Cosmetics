@@ -57,7 +57,7 @@ const Footer = () => {
             </a>
 
             <a
-              href="https://tiktok.com"
+              href="https://www.tiktok.com/@lamilage.cosmetic?_r=1&_t=ZS-95O6HhHsK29"
               target="_blank"
               rel="noopener noreferrer"
               style={{
